@@ -15,7 +15,7 @@ general:
   use_cuda: True  # disable this when running on machine without cuda
   env_seed: 42
   valid_env_id: 'tw-coin-collector_level10_gamesize10_step50_seed8_house-validation-v0'
-  test_env_id: ['tw-coin-collector_level05_gamesize10_step50_seed1_house-test-v0',
+  test_env_id: ['tw-coin-collector_level5_gamesize10_step50_seed1_house-test-v0',
                 'tw-coin-collector_level10_gamesize10_step50_seed1_house-test-v0',
                 'tw-coin-collector_level15_gamesize10_step50_seed1_house-test-v0',
                 'tw-coin-collector_level20_gamesize10_step50_seed1_house-test-v0',
