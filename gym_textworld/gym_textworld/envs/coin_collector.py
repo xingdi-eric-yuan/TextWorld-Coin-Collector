@@ -22,6 +22,7 @@ from textworld.generator.logger import GameLogger
 from textworld.generator import data
 from textworld.generator.vtypes import get_new
 from textworld.generator.graph_networks import reverse_direction
+from textworld.challenges.coin_collector import make_game, make_game_from_level
 
 from gym_textworld import spaces as text_spaces
 from gym_textworld.utils import make_infinite_shuffled_iterator
@@ -32,91 +33,6 @@ from hashids import Hashids
 def encode_seeds(seeds):
     hashids = Hashids(salt="TextWorld")
     return hashids.encode(*seeds)
-
-
-def make_coin_collector_game_from_level(level, grammar_flags, seeds):
-    """
-    Level difficulties are defined as follow:
-      Level   1 to 100: Nb. rooms = level, quest length = level
-      Level 101 to 200: Nb. rooms = 2 * (level % 100), quest length = level % 100,
-        distractors rooms added along the chain.
-      Level 201 to 300: Nb. rooms = 3 * (level % 100), quest length = level % 100,
-        distractors rooms *randomly* added along the chain.
-      ...
-    """
-    n_distractors = (level // 100)
-    quest_length = level % 100
-    n_rooms = (n_distractors + 1) * quest_length
-    distractor_mode = "random" if n_distractors > 2 else "simple"
-    return make_coin_collector_game(n_rooms, quest_length, distractor_mode, grammar_flags, seeds)
-
-
-def make_coin_collector_game(n_rooms, quest_length, distractor_mode, grammar_flags, seeds):
-    if distractor_mode == "simple" and float(n_rooms) / quest_length > 4:
-        msg = "Total number of rooms must be less than 4 * `quest_length` when distractor mode is 'simple'."
-        raise ValueError(msg)
-
-    metadata = {}  # Collect infos for reproducibility.
-    metadata["seeds"] = seeds
-    metadata["world_size"] = n_rooms
-    metadata["quest_length"] = quest_length
-    metadata["grammar_flags"] = grammar_flags
-
-    rng_map = np.random.RandomState(seeds['seed_map'])
-    # rng_objects = np.random.RandomState(seeds['seed_objects'])
-    # rng_quest = np.random.RandomState(seeds['seed_quest'])
-    rng_grammar = np.random.RandomState(seeds['seed_grammar'])
-
-    # Generate map.
-    M = textworld.GameMaker()
-    M.grammar = textworld.generator.make_grammar(flags=grammar_flags, rng=rng_grammar)
-
-    rooms = []
-    walkthrough = []
-    for i in range(quest_length):
-        r = M.new_room()
-        if i >= 1:
-            # Connect it to the previous rooms.
-            free_exits = [k for k, v in rooms[-1].exits.items() if v.dest is None]
-            src_exit = rng_map.choice(free_exits)
-            dest_exit = reverse_direction(src_exit)
-            M.connect(rooms[-1].exits[src_exit], r.exits[dest_exit])
-            walkthrough.append("go {}".format(src_exit))
-
-        rooms.append(r)
-
-    M.set_player(rooms[0])
-
-    # Add object the player has to pick up.
-    obj = M.new(type="o", name="coin")
-    rooms[-1].add(obj)
-
-    # Add distractor rooms, if needed.
-    chain_of_rooms = list(rooms)
-    while len(rooms) < n_rooms:
-        if distractor_mode == "random":
-            src = rng_map.choice(rooms)
-        else:
-            # Add one distractor room per room along the chain.
-            src = chain_of_rooms[len(rooms) % len(chain_of_rooms)]
-
-        free_exits = [k for k, v in src.exits.items() if v.dest is None]
-        if len(free_exits) == 0:
-            continue
-
-        dest = M.new_room()
-        src_exit = rng_map.choice(free_exits)
-        dest_exit = reverse_direction(src_exit)
-        M.connect(src.exits[src_exit], dest.exits[dest_exit])
-        rooms.append(dest)
-
-    # Generate the quest thats by collecting the coin.
-    walkthrough.append("take coin")
-    M.set_quest_from_commands(walkthrough)
-
-    game = M.build()
-
-    return game, metadata
 
 
 class CoinCollectorLevel(gym.Env):
@@ -182,7 +98,7 @@ class CoinCollectorLevel(gym.Env):
         return seeds_per_game
 
     def _make_game(self, seeds):
-        game, metadata = make_coin_collector_game_from_level(self.level, self.grammar_flags, seeds)
+        game = make_game_from_level(self.level, self.grammar_flags, seeds)
         hashid = encode_seeds([self.game_generator_seed, self.level] + [seeds[k] for k in sorted(seeds)])
         game_name = "{}_{}".format(self.spec.id, hashid)
         game_file = textworld.generator.compile_game(game, game_name,
