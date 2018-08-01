@@ -1,0 +1,1 @@
+import gym_textworld.coin_collector
