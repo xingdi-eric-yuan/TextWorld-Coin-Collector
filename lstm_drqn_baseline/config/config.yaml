@@ -1,0 +1,65 @@
+general:
+  experiment_tag: 'lstm_drqn_'
+  env_id: 'tw-coin-collector_level10_gamesize100_step50_seed6_house-v0'
+  discount_gamma: 0.5
+  revisit_counting_lambda_anneal_from: 1.0
+  replay_memory_priority_fraction: 0.25  # 0.0 to disable this
+  revisit_counting: "binarized"  # none, real, binarized, cumulative
+  torch_seed: 42
+  run_test: True
+  history_size: 8
+  update_from: 4
+  observation_cache_capacity: 1
+  
+  experiments_dir: '/home/eryua/exp_release/'
+  use_cuda: True  # disable this when running on machine without cuda
+  env_seed: 42
+  valid_env_id: 'tw-coin-collector_level10_gamesize10_step50_seed8_house-validation-v0'
+  test_env_id: ['tw-coin-collector_level05_gamesize10_step50_seed1_house-test-v0',
+                'tw-coin-collector_level10_gamesize10_step50_seed1_house-test-v0',
+                'tw-coin-collector_level15_gamesize10_step50_seed1_house-test-v0',
+                'tw-coin-collector_level20_gamesize10_step50_seed1_house-test-v0',
+                'tw-coin-collector_level30_gamesize10_step50_seed1_house-test-v0']
+  run_random_baseline: False
+  provide_prev_action: True
+  # replay memory
+  replay_memory_capacity: 500000 
+  update_per_k_game_steps: 4
+  replay_batch_size: 32
+
+  # epsilon greedy
+  epsilon_anneal_epochs: 1000  # -1 if not annealing
+  epsilon_anneal_from: 1.0
+  epsilon_anneal_to: 0.2
+
+  # counting reward
+  revisit_counting_lambda_anneal_epochs: -1  # -1 if not annealing
+  revisit_counting_lambda_anneal_to: 0.0
+
+logging_frequency:
+  reward: 5
+  test: 20
+
+cuda:
+  seed: 42
+  deterministic: true
+
+training:
+  scheduling:
+    batch_size: 10
+    test_batch_size: 10
+    epoch: 20000
+    model_checkpoint_path: 'saved_models/model1.pt'
+    model_checkpoint_frequency: 2000
+
+  optimizer:
+    step_rule: 'adam'  # adam, sgd
+    learning_rate: 0.001
+    clip_grad_norm: 5
+
+model:
+  lstm_dqn:
+    embedding_size: 20
+    encoder_rnn_hidden_size: [100]
+    action_scorer_hidden_dim: 64
+    dropout_between_rnn_layers: 0.
