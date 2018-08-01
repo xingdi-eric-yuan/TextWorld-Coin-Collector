@@ -1,29 +1,23 @@
 general:
   experiment_tag: 'lstm_dqn_'
   env_id: 'tw-coin-collector_level10_gamesize100_step50_seed6_house-v0'
-  discount_gamma: 0.5
-  revisit_counting_lambda_anneal_from: 1.0
-  replay_memory_priority_fraction: 0.25  # 0.0 to disable this
-  revisit_counting: True
-  torch_seed: 42
   run_test: True
-
-
-  observation_cache_capacity: 1
-
-  experiments_dir: '/home/eryua/exp_release/'
-  use_cuda: True  # disable this when running on machine without cuda
-  env_seed: 42
   valid_env_id: 'tw-coin-collector_level10_gamesize10_step50_seed8_house-validation-v0'
   test_env_id: ['tw-coin-collector_level5_gamesize10_step50_seed1_house-test-v0',
                 'tw-coin-collector_level10_gamesize10_step50_seed1_house-test-v0',
                 'tw-coin-collector_level15_gamesize10_step50_seed1_house-test-v0',
                 'tw-coin-collector_level20_gamesize10_step50_seed1_house-test-v0',
                 'tw-coin-collector_level30_gamesize10_step50_seed1_house-test-v0']
-  run_random_baseline: False
+  discount_gamma: 0.5
+  random_seed: 42
+  observation_cache_capacity: 1  # concat window of history observation, 1 means no history observations available
+  experiments_dir: '/home/eryua/exp_release/'
+  use_cuda: True  # disable this when running on machine without cuda
   provide_prev_action: True
+
   # replay memory
   replay_memory_capacity: 500000 
+  replay_memory_priority_fraction: 0.25  # 0.0 to disable this
   update_per_k_game_steps: 4
   replay_batch_size: 32
 
@@ -33,16 +27,10 @@ general:
   epsilon_anneal_to: 0.2
 
   # counting reward
+  revisit_counting: True
+  revisit_counting_lambda_anneal_from: 1.0
   revisit_counting_lambda_anneal_epochs: -1  # -1 if not annealing
   revisit_counting_lambda_anneal_to: 0.0
-
-logging_frequency:
-  reward: 5
-  test: 20
-
-cuda:
-  seed: 42
-  deterministic: true
 
 training:
   scheduling:
@@ -50,7 +38,7 @@ training:
     test_batch_size: 10
     epoch: 20000
     model_checkpoint_path: 'saved_models/model1.pt'
-    model_checkpoint_frequency: 2000
+    logging_frequency: 20
 
   optimizer:
     step_rule: 'adam'  # adam, sgd

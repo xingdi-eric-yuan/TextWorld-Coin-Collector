@@ -32,7 +32,7 @@ def train(config):
                                       batch_size=batch_size,
                                       parallel=True)
     env = gym.make(env_id)
-    env.seed(config['general']['env_seed'])
+    env.seed(config['general']['random_seed'])
 
     # valid and test env
     run_test = config['general']['run_test']
@@ -43,7 +43,7 @@ def train(config):
 
         valid_env_id = gym_textworld.make_batch(env_id=valid_env_name, batch_size=test_batch_size, parallel=True)
         valid_env = gym.make(valid_env_id)
-        valid_env.seed(config['general']['env_seed'])
+        valid_env.seed(config['general']['random_seed'])
 
         # test
         test_env_name_list = config['general']['test_env_id']
@@ -52,18 +52,18 @@ def train(config):
         test_env_id_list = [gym_textworld.make_batch(env_id=item, batch_size=test_batch_size, parallel=True) for item in test_env_name_list]
         test_env_list = [gym.make(test_env_id) for test_env_id in test_env_id_list]
         for i in range(len(test_env_list)):
-            test_env_list[i].seed(config['general']['env_seed'])
+            test_env_list[i].seed(config['general']['random_seed'])
     print('Done.')
 
     # Set the random seed manually for reproducibility.
-    np.random.seed(config['general']['torch_seed'])
-    torch.manual_seed(config['general']['torch_seed'])
+    np.random.seed(config['general']['random_seed'])
+    torch.manual_seed(config['general']['random_seed'])
     if torch.cuda.is_available():
         if not config['general']['use_cuda']:
             logger.warning("WARNING: CUDA device detected but 'use_cuda: false' found in config.yaml")
         else:
-            torch.backends.cudnn.deterministic = config['cuda']['deterministic']
-            torch.cuda.manual_seed(config['cuda']['seed'])
+            torch.backends.cudnn.deterministic = True
+            torch.cuda.manual_seed(config['general']['random_seed'])
     else:
         config['general']['use_cuda'] = False  # Disable CUDA.
     revisit_counting = config['general']['revisit_counting']
@@ -213,7 +213,7 @@ def train(config):
 
         # Tensorboard logging #
         # (1) Log some numbers
-        if (epoch + 1) % config["logging_frequency"]["test"] == 0:
+        if (epoch + 1) % config["training"]["scheduling"]["logging_frequency"] == 0:
             summary.add_scalar('avg_reward', reward_avg.value, epoch + 1)
             summary.add_scalar('curr_reward', agent.final_rewards.mean(), epoch + 1)
             summary.add_scalar('curr_interm_reward', agent.final_intermediate_rewards.mean(), epoch + 1)
@@ -229,7 +229,7 @@ def train(config):
                          np.mean(step_avg.value), agent.step_used_before_done.mean(),
                          np.mean(loss_avg.value), avg_loss_in_this_game,
                          epsilon, revisit_counting_lambda)
-        if (epoch + 1) % config["logging_frequency"]["test"] == 0:
+        if (epoch + 1) % config["training"]["scheduling"]["logging_frequency"] == 0:
             print("=========================================================")
             for prt_cmd, prt_rew, prt_int_rew, prt_rc_rew in zip(print_command_string, print_rewards, print_interm_rewards, print_rc_rewards):
                 print("------------------------------")
@@ -239,7 +239,7 @@ def train(config):
                 print(prt_rc_rew)
         print(msg)
         # test on a different set of games
-        if run_test and (epoch + 1) % config["logging_frequency"]["test"] == 0:
+        if run_test and (epoch + 1) % config["training"]["scheduling"]["logging_frequency"] == 0:
             valid_R, valid_IR, valid_S = test(config, valid_env, agent, test_batch_size, word2id)
             summary.add_scalar('valid_reward', valid_R, epoch + 1)
             summary.add_scalar('valid_interm_reward', valid_IR, epoch + 1)

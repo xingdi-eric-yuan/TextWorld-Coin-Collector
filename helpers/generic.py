@@ -1,6 +1,7 @@
 import os
 import numpy as np
 from os.path import join as pjoin
+from nltk.tokenize import word_tokenize as wt
 
 import torch
 from torch.autograd import Variable
