@@ -5,10 +5,10 @@ PyTorch implementation of papar [Counting to Explore and Generalize in Text-base
 ## Coin Collector
 * <p align=center><img width="70%" src="hard_level10.png" /></p>
 * Coin collector is a set of games, each game is a randomly connected chain of rooms, the agent's goal is to navigate through the path and pick up the coin.
-* Modes: Easy / Medium / Hard, amount of off-chain rooms.
+* Modes: easy / medium / hard, amount of off-chain rooms.
 * Levels: Length of optimal trajectory.
 * Action space: `{go, take} × {north, south, east, west, coin}​`
-* Environment ID: `tw-coin-collector_level[mode][level]_gamesize[#game]_step[max step]_seed[random seed]_[theme]-v0`, check [here][coin_collector] for more details.
+* Environment ID: `twcc_[mode]_level[level]_gamesize[#game]_step[max step]_seed[random seed]_[split]`, please check [here][coin_collector] for more details.
 
 ## Requirements
 * Python 3
@@ -17,7 +17,7 @@ PyTorch implementation of papar [Counting to Explore and Generalize in Text-base
 
 ## Game Generation
 * Install gym_textworld by `pip install gym_textworld`
-* use `tw-make.py env_id` to generate train / valid / test games.
+* run `tw-make.py <env_id>` to generate games corresponding to games defined in config files.
 
 ## To Run
 * LSTM-DQN: run `python lstm_dqn_baseline/train_single_generate_agent.py -c lstm_dqn_baseline/config/`.

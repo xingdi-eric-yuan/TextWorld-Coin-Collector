@@ -1,13 +1,13 @@
 general:
   experiment_tag: 'lstm_drqn_'
-  env_id: 'tw-coin-collector_level10_gamesize100_step50_seed6_house-v0'
+  env_id: 'twcc_easy_level10_gamesize100_step50_seed9_train'
   run_test: True
-  valid_env_id: 'tw-coin-collector_level10_gamesize10_step50_seed8_house-validation-v0'
-  test_env_id: ['tw-coin-collector_level5_gamesize10_step50_seed1_house-test-v0',
-                'tw-coin-collector_level10_gamesize10_step50_seed1_house-test-v0',
-                'tw-coin-collector_level15_gamesize10_step50_seed1_house-test-v0',
-                'tw-coin-collector_level20_gamesize10_step50_seed1_house-test-v0',
-                'tw-coin-collector_level30_gamesize10_step50_seed1_house-test-v0']
+  valid_env_id: 'twcc_easy_level10_gamesize10_step50_seed9_validation'
+  test_env_id: ['twcc_easy_level5_gamesize10_step50_seed1_test',
+                'twcc_easy_level10_gamesize10_step50_seed0_test',
+                'twcc_easy_level15_gamesize10_step50_seed3_test',
+                'twcc_easy_level20_gamesize10_step50_seed2_test',
+                'twcc_easy_level30_gamesize10_step50_seed3_test']
   discount_gamma: 0.5
   random_seed: 42
   observation_cache_capacity: 1  # concat window of history observation, 1 means no history observations available
