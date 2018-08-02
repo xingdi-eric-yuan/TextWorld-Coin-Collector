@@ -14,6 +14,7 @@ PyTorch implementation of papar [Counting to Explore and Generalize in Text-base
 * Python 3
 * [PyTorch][pytorch_install]
 * [TextWorld][textworld_install]
+* [tensorboardX][tensorboardx_install]
 
 ## Game Generation
 * Install gym_textworld by `pip install gym_textworld`
@@ -34,6 +35,7 @@ PyTorch implementation of papar [Counting to Explore and Generalize in Text-base
 
 [pytorch_install]: http://pytorch.org/
 [textworld_install]: https://github.com/Microsoft/TextWorld/
+[tensorboardx_install]: https://github.com/lanpa/tensorboardX/
 [counting]: https://arxiv.org/abs/1806.11525/
 [textworld_paper]: https://arxiv.org/abs/1806.11532/
 [coin_collector]: https://github.com/xingdi-eric-yuan/TextWorld-Coin-Collector/blob/master/gym_textworld/gym_textworld/coin_collector.py/
