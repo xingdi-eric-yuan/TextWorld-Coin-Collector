@@ -17,7 +17,8 @@ PyTorch implementation of papar [Counting to Explore and Generalize in Text-base
 
 ## Game Generation
 * Install gym_textworld by `pip install gym_textworld`
-* run `tw-make.py <env_id>` to generate games corresponding to games defined in config files.
+* Run `tw-make.py <env_id>` to generate games corresponding to games defined in config files.
+* You can use `scripts/check_for_duplicates.py` to check duplicates between training and /test sets.
 
 ## To Run
 * LSTM-DQN: run `python lstm_dqn_baseline/train_single_generate_agent.py -c lstm_dqn_baseline/config/`.
