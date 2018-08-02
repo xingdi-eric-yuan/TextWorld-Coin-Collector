@@ -12,7 +12,7 @@ PyTorch implementation of papar [Counting to Explore and Generalize in Text-base
 
 ## Requirements
 * Python 3
-* [PyTorch][pytorch_install].
+* [PyTorch][pytorch_install]
 * [TextWorld][textworld_install]
 
 ## Game Generation
@@ -21,7 +21,7 @@ PyTorch implementation of papar [Counting to Explore and Generalize in Text-base
 
 ## To Run
 * LSTM-DQN: run `python lstm_dqn_baseline/train_single_generate_agent.py -c lstm_dqn_baseline/config/`.
-* LSTM-DRQN: run `python lstm_drqn_baseline/train_single_generate_agent.py -c lstm_dqn_baseline/config/`.
+* LSTM-DRQN: run `python lstm_drqn_baseline/train_single_generate_agent.py -c lstm_drqn_baseline/config/`.
 * Configurations can be modified in the above two config files.
 
 ## LICENSE
