@@ -3,7 +3,7 @@
 PyTorch implementation of papar [Counting to Explore and Generalize in Text-based Games][counting]
 
 ## Coin Collector
-* <p align=center><img width="70%" src="level210.png" /></p>
+* <p align=center><img width="70%" src="hard_level10.png" /></p>
 * Coin collector is a set of games, each game is a randomly connected chain of rooms, the agent's goal is to navigate through the path and pick up the coin.
 * Modes: Easy / Medium / Hard, amount of off-chain rooms.
 * Levels: Length of optimal trajectory.
