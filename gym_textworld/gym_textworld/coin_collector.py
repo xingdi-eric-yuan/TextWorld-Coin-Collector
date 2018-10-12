@@ -1,83 +1,51 @@
 """
 Register all environments related to the Coin Collector benchmark.
 """
+import re
+
 from gym.envs.registration import register
-mode_to_level = {"easy": 0, "medium": 100, "hard": 200}
 
 
-MAX_LEVEL = 40
-for mode in ["easy", "medium", "hard"]:
-    for level in list(range(1, MAX_LEVEL + 1)):
-        for n_games in [1, 2, 3, 5, 10, 30, 50, 100, 500, 1000]:
-            for random_seed in range(10):
-                for max_steps in [50, 200]:
-                    register(
-                        id='twcc_{}_level{}_gamesize{}_step{}_seed{}_train'.format(mode, level, n_games, max_steps, random_seed),
-                        entry_point='gym_textworld.envs:CoinCollectorLevel',
-                        max_episode_steps=max_steps,
-                        kwargs={
-                            'n_games': n_games,
-                            'level': mode_to_level[mode] + level,
-                            'game_generator_seed': 20180514 + mode_to_level[mode] * 10000 + level * 1000 + n_games * 100 + random_seed * 10 + max_steps,
-                            'request_infos': [
-                                "objective",
-                                "description",
-                                "inventory",
-                                "command_feedback",
-                                "intermediate_reward",
-                                "admissible_commands"
-                            ],
-                            'grammar_flags': {
-                                "theme": "house",
-                                "only_last_action": True,
-                            }
-                        }
-                    )
+PATTERN = re.compile(r"twcc_(easy|medium|hard)_level(\d+)_gamesize(\d+)_step(\d+)_seed(\d+)_(train|validation|test)")
+SEED_OFFSETS = {'train': 20180514, 'validation': 81020619, 'test': 41508102}
+MODE2LEVEL = {"easy": 0, "medium": 100, "hard": 200}
 
-                    # Validation
-                    register(
-                        id='twcc_{}_level{}_gamesize{}_step{}_seed{}_validation'.format(mode, level, n_games, max_steps, random_seed),
-                        entry_point='gym_textworld.envs:CoinCollectorLevel',
-                        max_episode_steps=max_steps,
-                        kwargs={
-                            'n_games': n_games,
-                            'level': mode_to_level[mode] + level,
-                            'game_generator_seed': 81020619 + mode_to_level[mode] * 10000 + level * 1000 + n_games * 100 + random_seed * 10 + max_steps,
-                            'request_infos': [
-                                "objective",
-                                "description",
-                                "inventory",
-                                "command_feedback",
-                                "intermediate_reward",
-                                "admissible_commands"
-                            ],
-                            'grammar_flags': {
-                                "theme": "house",
-                                "only_last_action": True,
-                            }
-                        }
-                    )
 
-                    # Test
-                    register(
-                        id='twcc_{}_level{}_gamesize{}_step{}_seed{}_test'.format(mode, level, n_games, max_steps, random_seed),
-                        entry_point='gym_textworld.envs:CoinCollectorLevel',
-                        max_episode_steps=max_steps,
-                        kwargs={
-                            'n_games': n_games,
-                            'level': mode_to_level[mode] + level,
-                            'game_generator_seed': 41508102 + mode_to_level[mode] * 10000 + level * 1000 + n_games * 100 + random_seed * 10 + max_steps,
-                            'request_infos': [
-                                "objective",
-                                "description",
-                                "inventory",
-                                "command_feedback",
-                                "intermediate_reward",
-                                "admissible_commands"
-                            ],
-                            'grammar_flags': {
-                                "theme": "house",
-                                "only_last_action": True,
-                            }
-                        }
-                    )
+def make(env_id):
+    match = re.match(PATTERN, env_id)
+    if not match:
+        msg = "env_id should match the following pattern:\n{}"
+        raise ValueError(msg.format(PATTERN.pattern))
+
+    mode = match.group(1)
+    level = int(match.group(2))
+    n_games = int(match.group(3))
+    max_steps = int(match.group(4))
+    random_seed = int(match.group(5))
+    split = match.group(6)
+
+    game_generator_seed = SEED_OFFSETS[split] + MODE2LEVEL[mode] * 10000 + level * 1000 + n_games * 100 + random_seed * 10 + max_steps
+    env_id = env_id + "-v0"
+    register(
+        id=env_id,
+        entry_point='gym_textworld.envs:CoinCollectorLevel',
+        max_episode_steps=max_steps,
+        kwargs={
+            'n_games': n_games,
+            'level': MODE2LEVEL[mode] + level,
+            'game_generator_seed': game_generator_seed,
+            'request_infos': [
+                "objective",
+                "description",
+                "inventory",
+                "command_feedback",
+                "intermediate_reward",
+                "admissible_commands"
+            ],
+            'grammar_flags': {
+                "theme": "house",
+                "only_last_action": True,
+            }
+        }
+    )
+    return env_id

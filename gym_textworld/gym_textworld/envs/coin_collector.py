@@ -2,8 +2,9 @@ import os
 import sys
 import json
 import numpy as np
+from os.path import join as pjoin
 
-from six import StringIO
+from io import StringIO
 
 import gym
 from gym.utils import colorize
@@ -12,9 +13,11 @@ import textworld
 from textworld import g_rng
 from textworld.utils import uniquify
 try:
+    from textworld import GameOptions
+    from textworld.generator.text_grammar import GrammarOptions
     from textworld.logic import Variable, Proposition
 except ModuleNotFoundError:
-    print("*** Deprecated: textworld.generator.logic has been moved to textworld.logic. Please update TextWorld. ***")
+    print("*** Please update TextWorld. ***")
     from textworld.generator.logic import Variable, Proposition
 
 from textworld.generator import Quest, World
@@ -88,22 +91,23 @@ class CoinCollectorLevel(gym.Env):
         seeds_per_game = []
         for i in range(self.n_games):
             seeds = {}
-            seeds["seed_map"] = self.rng_make.randint(65635)  # Shuffle map
-            seeds["seed_objects"] = self.rng_make.randint(65635)  # Shuffle objects
-            seeds["seed_quest"] = self.rng_make.randint(65635)  # Shuffle quest
-            seeds["seed_grammar"] = self.rng_make.randint(65635)  # Shuffle grammar
-            seeds["seed_inform7"] = self.seed_inform7
+            seeds["map"] = self.rng_make.randint(65635)  # Shuffle map
+            seeds["objects"] = self.rng_make.randint(65635)  # Shuffle objects
+            seeds["quest"] = self.rng_make.randint(65635)  # Shuffle quest
+            seeds["grammar"] = self.rng_make.randint(65635)  # Shuffle grammar
+            seeds["inform7"] = self.seed_inform7
             seeds_per_game.append(seeds)
 
         return seeds_per_game
 
     def _make_game(self, seeds):
-        game = make_game_from_level(self.level, self.grammar_flags, seeds)
+        options = GameOptions()
+        options.seeds = seeds
+        options.grammar = GrammarOptions(self.grammar_flags)
+        game = make_game_from_level(self.level, options)
         hashid = encode_seeds([self.game_generator_seed, self.level] + [seeds[k] for k in sorted(seeds)])
         game_name = "{}_{}".format(self.spec.id, hashid)
-        game_file = textworld.generator.compile_game(game, game_name,
-                                                     games_folder="gen_games/{}".format(self.spec.id))
-
+        game_file = textworld.generator.compile_game(game, path=pjoin("gen_games", str(self.spec.id), game_name + ".ulx"))
         return game_file
 
     def _next_game(self):
@@ -147,8 +151,6 @@ class CoinCollectorLevel(gym.Env):
         self.current_game = self._next_game()
         self.infos = {}
         self.infos["game_file"] = os.path.basename(self.current_game)
-        with open(self.current_game.replace(".ulx", ".meta")) as f:
-            self.infos["metadata"] = json.load(f)
 
         if self.textworld_env is not None:
             self.textworld_env.close()

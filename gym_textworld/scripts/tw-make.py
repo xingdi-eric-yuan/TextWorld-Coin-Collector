@@ -15,7 +15,8 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("env_id",
                         help="Gym-Textworld Environment for which to generate"
-                             " the games.")
+                             " the games. Should follow this pattern"
+                             " twcc_[easy|medium|hard]_level[int]_gamesize[int]_step[int]_seed[int]_[train|validation|test]")
     parser.add_argument("--env_seed", type=int,
                         help="Random seed for generating the games.")
     parser.add_argument("--nb-processes", type=int,
@@ -45,7 +46,8 @@ def main():
     if args.nb_processes is None:
         args.nb_processes = multiprocessing.cpu_count()
 
-    env = gym.make(args.env_id)
+    env_id = gym_textworld.make(args.env_id)
+    env = gym.make(env_id)
     env.seed(args.env_seed)
     nb_games = env.unwrapped.n_games
     skip_list = range(nb_games)
@@ -57,7 +59,7 @@ def main():
     if args.nb_processes > 1:
         pool = multiprocessing.Pool(args.nb_processes)
         for skip in skip_list:
-            pool.apply_async(_generate_game, (args.env_id, skip), callback=lambda _: pbar.update())
+            pool.apply_async(_generate_game, (env_id, skip), callback=lambda _: pbar.update())
 
         pool.close()
         pool.join()
@@ -65,7 +67,7 @@ def main():
 
     else:
         for skip in skip_list:
-            _generate_game(args.env_id, skip)
+            _generate_game(env_id, skip)
             pbar.update()
 
 

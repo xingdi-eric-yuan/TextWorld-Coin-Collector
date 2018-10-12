@@ -1,5 +1,7 @@
 from gym.envs.registration import register, spec
 
+import gym_textworld
+
 
 def make_infinite_shuffled_iterator(iterable, rng):
     """
@@ -29,6 +31,7 @@ def make_batch(env_id, batch_size, parallel=False):
     parallel : {True, False}, optional
         If True, the environment will be executed in different processes.
     """
+    env_id = gym_textworld.make(env_id)
     batch_env_id = "batch{}-".format(batch_size) + env_id
     env_spec = spec(env_id)
     entry_point = 'gym_textworld.envs:BatchEnv'
