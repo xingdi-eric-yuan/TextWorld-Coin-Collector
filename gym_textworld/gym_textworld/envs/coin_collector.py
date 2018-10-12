@@ -12,6 +12,7 @@ from gym.utils import colorize
 import textworld
 from textworld import g_rng
 from textworld.utils import uniquify
+import textworld.text_utils
 try:
     from textworld import GameOptions
     from textworld.generator.text_grammar import GrammarOptions
