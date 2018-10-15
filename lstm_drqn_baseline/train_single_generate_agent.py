@@ -200,7 +200,7 @@ def train(config):
                 optimizer.zero_grad()
                 loss.backward(retain_graph=True)
                 # `clip_grad_norm` helps prevent the exploding gradient problem in RNNs / LSTMs.
-                torch.nn.utils.clip_grad_norm(agent.model.parameters(), config['training']['optimizer']['clip_grad_norm'])
+                torch.nn.utils.clip_grad_norm_(agent.model.parameters(), config['training']['optimizer']['clip_grad_norm'])
                 optimizer.step()  # apply gradients
                 avg_loss_in_this_game.append(to_np(policy_loss))
             current_game_step += 1
