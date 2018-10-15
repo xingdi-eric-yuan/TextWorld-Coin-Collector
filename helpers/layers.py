@@ -48,36 +48,15 @@ class Embedding(torch.nn.Module):
         self.vocab_size = vocab_size
         self.enable_cuda = enable_cuda
         self.embedding_layer = torch.nn.Embedding(self.vocab_size, self.embedding_size, padding_idx=0)
-        self.init_weights()
-
-    def init_weights(self):
-        init_embedding_matrix = self.embedding_init()
-        self.embedding_layer.weight = torch.nn.Parameter(init_embedding_matrix)
-
-    def embedding_init(self):
-        # Embeddings
-        word_embedding_init = np.random.uniform(low=-0.05, high=0.05, size=(self.vocab_size, self.embedding_size))
-        word_embedding_init[0, :] = 0
-        word_embedding_init = torch.from_numpy(word_embedding_init).float()
-        if self.enable_cuda:
-            word_embedding_init = word_embedding_init.cuda()
-        return word_embedding_init
 
     def compute_mask(self, x):
         mask = torch.ne(x, 0).float()
+        if self.enable_cuda:
+            mask = mask.cuda()
         return mask
 
-    def embed(self, words):
-        masked_embed_weight = self.embedding_layer.weight
-        padding_idx = self.embedding_layer.padding_idx
-        X = self.embedding_layer._backend.Embedding.apply(
-            words, masked_embed_weight,
-            padding_idx, self.embedding_layer.max_norm, self.embedding_layer.norm_type,
-            self.embedding_layer.scale_grad_by_freq, self.embedding_layer.sparse)
-        return X
-
     def forward(self, x):
-        embeddings = self.embed(x)  # batch x time x emb
+        embeddings = self.embedding_layer(x)  # batch x time x emb
         mask = self.compute_mask(x)  # batch x time
         return embeddings, mask
 
@@ -110,8 +89,8 @@ class LSTMCell(torch.nn.Module):
         self.reset_parameters()
 
     def reset_parameters(self):
-        torch.nn.init.orthogonal(self.weight_hh.data)
-        torch.nn.init.xavier_uniform(self.weight_ih.data, gain=1)
+        torch.nn.init.orthogonal_(self.weight_hh.data)
+        torch.nn.init.xavier_uniform_(self.weight_ih.data, gain=1)
         if self.use_bias:
             self.bias_f.data.fill_(1.0)
             self.bias_iog.data.fill_(0.0)
@@ -158,7 +137,7 @@ class LSTMCell(torch.nn.Module):
         if self.use_bias:
             pre_act = pre_act + torch.cat([self.bias_f, self.bias_iog]).unsqueeze(0)
 
-        f, i, o, g = torch.split(pre_act, split_size=self.hidden_size, dim=1)
+        f, i, o, g = torch.split(pre_act, split_size_or_sections=self.hidden_size, dim=1)
         expand_mask_ = mask_.unsqueeze(1)  # batch x None
         c_1 = torch.sigmoid(f) * c_0 + torch.sigmoid(i) * torch.tanh(g)
         c_1 = c_1 * expand_mask_ + c_0 * (1 - expand_mask_)
@@ -213,7 +192,7 @@ class FastUniLSTM(torch.nn.Module):
         """
         # Compute sorted sequence lengths
         batch_size = x.size(0)
-        lengths = mask.data.eq(1).long().sum(1).squeeze()
+        lengths = mask.data.eq(1).long().sum(1)  # .squeeze()
         _, idx_sort = torch.sort(lengths, dim=0, descending=True)
         _, idx_unsort = torch.sort(idx_sort, dim=0)
 
