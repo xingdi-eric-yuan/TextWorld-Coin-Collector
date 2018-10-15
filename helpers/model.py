@@ -67,9 +67,9 @@ class LSTM_DQN(torch.nn.Module):
         self.fake_recurrent_mask = None
 
     def init_weights(self):
-        torch.nn.init.xavier_uniform(self.action_scorer_shared.weight.data, gain=1)
-        torch.nn.init.xavier_uniform(self.action_scorer_action.weight.data, gain=1)
-        torch.nn.init.xavier_uniform(self.action_scorer_object.weight.data, gain=1)
+        torch.nn.init.xavier_uniform_(self.action_scorer_shared.weight.data, gain=1)
+        torch.nn.init.xavier_uniform_(self.action_scorer_action.weight.data, gain=1)
+        torch.nn.init.xavier_uniform_(self.action_scorer_object.weight.data, gain=1)
         self.action_scorer_shared.bias.data.fill_(0)
 
     def representation_generator(self, _input_words):
