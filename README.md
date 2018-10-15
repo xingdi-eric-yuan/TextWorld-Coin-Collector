@@ -12,7 +12,7 @@ PyTorch implementation of papar [Counting to Explore and Generalize in Text-base
 
 ## Requirements
 * Python 3
-* [PyTorch][pytorch_install]
+* [PyTorch 0.4][pytorch_install]
 * [TextWorld][textworld_install]
 * [tensorboardX][tensorboardx_install]
 
