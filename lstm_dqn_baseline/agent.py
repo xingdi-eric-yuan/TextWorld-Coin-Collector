@@ -175,7 +175,7 @@ class RLAgent(object):
         for i in range(batch_size):
             v_qvalue.append(verb_rank[i][v_idx[i]])
             n_qvalue.append(noun_rank[i][n_idx[i]])
-        v_qvalue, n_qvalue = torch.cat(v_qvalue), torch.cat(n_qvalue)
+        v_qvalue, n_qvalue = torch.stack(v_qvalue), torch.stack(n_qvalue)
         v_idx, n_idx = to_pt(np.array(v_idx), self.use_cuda), to_pt(np.array(n_idx), self.use_cuda)
         return v_qvalue, v_idx, n_qvalue, n_idx
 
@@ -188,7 +188,7 @@ class RLAgent(object):
         for i in range(batch_size):
             v_qvalue.append(verb_rank[i][v_idx[i]])
             n_qvalue.append(noun_rank[i][n_idx[i]])
-        v_qvalue, n_qvalue = torch.cat(v_qvalue), torch.cat(n_qvalue)
+        v_qvalue, n_qvalue = torch.stack(v_qvalue), torch.stack(n_qvalue)
         v_idx, n_idx = to_pt(v_idx, self.use_cuda), to_pt(n_idx, self.use_cuda)
         return v_qvalue, v_idx, n_qvalue, n_idx
 
@@ -300,7 +300,7 @@ class RLAgent(object):
 
         _, verb_rank, noun_rank = self.get_ranks(input_observation)
 
-        v_qvalue, n_qvalue = verb_rank.gather(1, v_idx).squeeze(-1), noun_rank.gather(1, n_idx).squeeze(-1)  # batch
+        v_qvalue, n_qvalue = verb_rank.gather(1, v_idx.unsqueeze(-1)).squeeze(-1), noun_rank.gather(1, n_idx.unsqueeze(-1)).squeeze(-1)  # batch
         q_value = torch.mean(torch.stack([v_qvalue, n_qvalue], -1), -1)  # batch
 
         _, next_verb_rank, next_noun_rank = self.get_ranks(next_input_observation)  # batch x n_verb, batch x n_noun
@@ -308,11 +308,11 @@ class RLAgent(object):
         next_q_value = torch.mean(torch.stack([next_v_qvalue, next_n_qvalue], -1), -1)  # batch
         next_q_value = next_q_value.detach()
 
-        rewards = torch.cat(batch.reward)  # batch
+        rewards = torch.stack(batch.reward)  # batch
         not_done = 1.0 - np.array(batch.done, dtype='float32')  # batch
         not_done = to_pt(not_done, self.use_cuda, type='float')
         rewards = rewards + not_done * next_q_value * discount_gamma  # batch
-        mask = torch.cat(batch.mask)  # batch
+        mask = torch.stack(batch.mask)  # batch
         loss = F.smooth_l1_loss(q_value * mask, rewards * mask)
         return loss
 

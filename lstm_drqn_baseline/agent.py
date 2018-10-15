@@ -223,7 +223,7 @@ class RLAgent(object):
         for i in range(batch_size):
             v_qvalue.append(verb_rank[i][v_idx[i]])
             n_qvalue.append(noun_rank[i][n_idx[i]])
-        v_qvalue, n_qvalue = torch.cat(v_qvalue), torch.cat(n_qvalue)
+        v_qvalue, n_qvalue = torch.stack(v_qvalue), torch.stack(n_qvalue)
         v_idx, n_idx = to_pt(np.array(v_idx), self.use_cuda), to_pt(np.array(n_idx), self.use_cuda)
         return v_qvalue, v_idx, n_qvalue, n_idx
 
@@ -236,7 +236,7 @@ class RLAgent(object):
         for i in range(batch_size):
             v_qvalue.append(verb_rank[i][v_idx[i]])
             n_qvalue.append(noun_rank[i][n_idx[i]])
-        v_qvalue, n_qvalue = torch.cat(v_qvalue), torch.cat(n_qvalue)
+        v_qvalue, n_qvalue = torch.stack(v_qvalue), torch.stack(n_qvalue)
         v_idx, n_idx = to_pt(v_idx, self.use_cuda), to_pt(n_idx, self.use_cuda)
         return v_qvalue, v_idx, n_qvalue, n_idx
 
@@ -356,7 +356,7 @@ class RLAgent(object):
         v_idx = torch.stack(sequences[0].v_idx, 0)  # batch x 1
         n_idx = torch.stack(sequences[0].n_idx, 0)  # batch x 1
         verb_rank, noun_rank, curr_ras_hidden, curr_ras_cell = self.get_ranks(input_observation, prev_ras_hidden, prev_ras_cell)
-        v_qvalue, n_qvalue = verb_rank.gather(1, v_idx).squeeze(-1), noun_rank.gather(1, n_idx).squeeze(-1)  # batch
+        v_qvalue, n_qvalue = verb_rank.gather(1, v_idx.unsqueeze(-1)).squeeze(-1), noun_rank.gather(1, n_idx.unsqueeze(-1)).squeeze(-1)  # batch
         prev_qvalue = torch.mean(torch.stack([v_qvalue, n_qvalue], -1), -1)  # batch
         if update_from > 0:
             prev_qvalue, curr_ras_hidden, curr_ras_cell = prev_qvalue.detach(), curr_ras_hidden.detach(), curr_ras_cell.detach()
@@ -373,16 +373,16 @@ class RLAgent(object):
             q_value_max = torch.mean(torch.stack([v_qvalue_max, n_qvalue_max], -1), -1)  # batch
             q_value_max = q_value_max.detach()
             # from memory
-            v_qvalue, n_qvalue = verb_rank.gather(1, v_idx).squeeze(-1), noun_rank.gather(1, n_idx).squeeze(-1)  # batch
+            v_qvalue, n_qvalue = verb_rank.gather(1, v_idx.unsqueeze(-1)).squeeze(-1), noun_rank.gather(1, n_idx.unsqueeze(-1)).squeeze(-1)  # batch
             q_value = torch.mean(torch.stack([v_qvalue, n_qvalue], -1), -1)  # batch
             if i < update_from or i == len(sequences) - 1:
                 q_value, curr_ras_hidden, curr_ras_cell = q_value.detach(), curr_ras_hidden.detach(), curr_ras_cell.detach()
             if i > update_from:
-                prev_rewards = torch.cat(sequences[i - 1].reward)  # batch
+                prev_rewards = torch.stack(sequences[i - 1].reward)  # batch
                 prev_not_done = 1.0 - np.array(sequences[i - 1].done, dtype='float32')  # batch
                 prev_not_done = to_pt(prev_not_done, self.use_cuda, type='float')
                 prev_rewards = prev_rewards + prev_not_done * q_value_max * discount_gamma  # batch
-                prev_mask = torch.cat(sequences[i - 1].mask)  # batch
+                prev_mask = torch.stack(sequences[i - 1].mask)  # batch
                 prev_loss = F.smooth_l1_loss(prev_qvalue * prev_mask, prev_rewards * prev_mask)
                 losses.append(prev_loss)
             prev_qvalue = q_value
