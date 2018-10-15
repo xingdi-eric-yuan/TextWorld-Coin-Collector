@@ -192,8 +192,6 @@ def train(config):
                 memory_cache[b].append((curr_description_id_list[b], v_idx[b], n_idx[b], rewards_pt[b], mask_pt[b], dones[b], is_final, curr_observation_strings[b]))
 
             if current_game_step > 0 and current_game_step % config["general"]["update_per_k_game_steps"] == 0:
-                # remove dropout
-                agent.model.eval()
                 policy_loss = agent.update(replay_batch_size, history_size, update_from, discount_gamma=discount_gamma)
                 if policy_loss is None:
                     continue
