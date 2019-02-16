@@ -13,7 +13,7 @@ PyTorch implementation of papar [Counting to Explore and Generalize in Text-base
 ## Requirements
 * Python 3
 * [PyTorch 0.4][pytorch_install]
-* [TextWorld][textworld_install]
+* [TextWorld][textworld_install] `coin_collector` branch
 * [tensorboardX][tensorboardx_install]
 
 ## Game Generation
