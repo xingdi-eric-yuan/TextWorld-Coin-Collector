@@ -13,12 +13,17 @@ PyTorch implementation of papar [Counting to Explore and Generalize in Text-base
 ## Requirements
 * Python 3
 * [PyTorch 0.4][pytorch_install]
-* [TextWorld][textworld_install] `coin_collector` branch
+* [TextWorld][textworld_install]: clone the `coin_collector` branch and `pip install .` in the repo
 * [tensorboardX][tensorboardx_install]
+* nltk + the punkt package:
+  * `pip install nltk`
+  * `python`
+  * `>>> import nltk`
+  * `>>> nltk.download('punkt')`
 
 ## Game Generation
-* Install gym_textworld by `pip install gym_textworld`
-* Run `tw-make.py <env_id>` to generate games corresponding to games defined in config files.
+* Install gym_textworld: in the `gym_textworld` folder: `pip install .`
+* Run `tw-make tw-coin_collector --level x` to generate a game of level `x`.
 * You can use `scripts/check_for_duplicates.py` to check duplicates between training and /test sets.
 
 ## To Run
@@ -33,7 +38,7 @@ PyTorch implementation of papar [Counting to Explore and Generalize in Text-base
 * [TextWorld: A Learning Environment for Text-based Games][textworld_paper]
 * [Counting to Explore and Generalize in Text-based Games][counting]
 
-[pytorch_install]: http://pytorch.org/
+[pytorch_install]: https://pytorch.org/get-started/previous-versions/
 [textworld_install]: https://github.com/Microsoft/TextWorld/
 [tensorboardx_install]: https://github.com/lanpa/tensorboardX/
 [counting]: https://arxiv.org/abs/1806.11525/
