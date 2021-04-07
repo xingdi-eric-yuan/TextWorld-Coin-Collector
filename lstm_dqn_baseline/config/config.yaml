@@ -11,12 +11,12 @@ general:
   discount_gamma: 0.5
   random_seed: 42
   observation_cache_capacity: 1  # concat window of history observation, 1 means no history observations available
-  experiments_dir: '/home/eryua/exp_release/'
+  experiments_dir: 'experiments/lstm_dqn'
   use_cuda: True  # disable this when running on machine without cuda
   provide_prev_action: True
 
   # replay memory
-  replay_memory_capacity: 500000 
+  replay_memory_capacity: 500000
   replay_memory_priority_fraction: 0.25  # 0.0 to disable this
   update_per_k_game_steps: 4
   replay_batch_size: 32
