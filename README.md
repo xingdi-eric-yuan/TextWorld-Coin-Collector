@@ -3,7 +3,8 @@
 PyTorch implementation of papar [Counting to Explore and Generalize in Text-based Games][counting]
 
 ## Coin Collector
-* <p align=center><img width="70%" src="hard_level10.png" /></p>
+<p align=center><img width="70%" src="hard_level10.png" /></p>
+
 * Coin collector is a set of games, each game is a randomly connected chain of rooms, the agent's goal is to navigate through the path and pick up the coin.
 * Modes: easy / medium / hard, amount of off-chain rooms.
 * Levels: Length of optimal trajectory.
@@ -13,17 +14,18 @@ PyTorch implementation of papar [Counting to Explore and Generalize in Text-base
 ## Requirements
 * Python 3
 * [PyTorch 0.4][pytorch_install]
-* [TextWorld][textworld_install]: clone the `coin_collector` branch and `pip install .` in the repo
+* [TextWorld][textworld_install]: install the `coin_collector` branch
+  * `pip install https://github.com/microsoft/TextWorld/archive/refs/heads/coin_collector.zip`
 * [tensorboardX][tensorboardx_install]
+  * `pip install tensorboardX`
 * nltk + the punkt package:
-  * `pip install nltk`
-  * `python`
-  * `>>> import nltk`
-  * `>>> nltk.download('punkt')`
+  * `pip install nltk pytest`
+  * `python -c "import nltk; nltk.download('punkt')"`
 
 ## Game Generation
-* Install gym_textworld: in the `gym_textworld` folder: `pip install .`
-* Run `tw-make tw-coin_collector --level x` to generate a game of level `x`.
+* Install gym_textworld by `pip install gym_textworld`.
+* Run `tw-make.py <env_id>` to generate games corresponding to games defined in config files.
+  * E.g., `tw-make.py twcc_easy_level10_gamesize100_step50_seed9_train`.
 * You can use `scripts/check_for_duplicates.py` to check duplicates between training and /test sets.
 
 ## To Run
