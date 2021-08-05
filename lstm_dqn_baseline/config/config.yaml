@@ -27,7 +27,7 @@ general:
   epsilon_anneal_to: 0.2
 
   # counting reward
-  revisit_counting: True
+  revisit_counting: "episodic"  # "cumulative", "episodic", null
   revisit_counting_lambda_anneal_from: 1.0
   revisit_counting_lambda_anneal_epochs: -1  # -1 if not annealing
   revisit_counting_lambda_anneal_to: 0.0

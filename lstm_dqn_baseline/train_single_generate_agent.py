@@ -120,6 +120,8 @@ def train(config):
 
     epsilon = epsilon_anneal_from
     revisit_counting_lambda = revisit_counting_lambda_anneal_from
+    if revisit_counting == "cumulative":
+        agent.reset_cumulative_counter()
     for epoch in range(config['training']['scheduling']['epoch']):
 
         agent.model.train()
@@ -134,9 +136,15 @@ def train(config):
         avg_loss_in_this_game = []
 
         new_observation_strings = agent.get_observation_strings(infos)
-        if revisit_counting:
+        if revisit_counting == "episodic":
             agent.reset_binarized_counter(batch_size)
             revisit_counting_rewards = agent.get_binarized_count(new_observation_strings)
+        elif revisit_counting == "cumulative":
+            # do not reset counter here
+            revisit_counting_rewards = agent.get_cumulative_count(new_observation_strings)
+        else:
+            # revisit_counting is None
+            pass
 
         current_game_step = 0
         prev_actions = ["" for _ in range(batch_size)] if provide_prev_action else None
@@ -150,8 +158,10 @@ def train(config):
             if provide_prev_action:
                 prev_actions = chosen_strings
             # counting
-            if revisit_counting:
+            if revisit_counting == "episodic":
                 revisit_counting_rewards = agent.get_binarized_count(new_observation_strings, update=True)
+            elif revisit_counting == "cumulative":
+                revisit_counting_rewards = agent.get_cumulative_count(new_observation_strings, update=True)
             else:
                 revisit_counting_rewards = [0.0 for _ in range(batch_size)]
             agent.revisit_counting_rewards.append(revisit_counting_rewards)

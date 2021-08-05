@@ -20,3 +20,5 @@ frotz
 !textworld/envs/frotz
 gameinfo.dbg
 textworld_data/
+lstm_dqn_baseline/.DS_Store
+.DS_Store
