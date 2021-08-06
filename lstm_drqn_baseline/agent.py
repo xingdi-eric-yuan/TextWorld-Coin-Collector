@@ -428,17 +428,17 @@ class RLAgent(object):
 
     def reset_cumulative_counter(self):
         self.cumulative_counter_dict = {}
-    
+
     def get_cumulative_count(self, observation_strings, update=True):
         batch_size = len(observation_strings)
         count_rewards = []
         for i in range(batch_size):
             concat_string = observation_strings[i]
-            if concat_string not in self.binarized_counter_dict[i]:
-                self.binarized_counter_dict[i][concat_string] = 0.0
+            if concat_string not in self.cumulative_counter_dict:
+                self.cumulative_counter_dict[concat_string] = 0.0
             if update:
-                self.binarized_counter_dict[i][concat_string] += 1.0
-            r = self.binarized_counter_dict[i][concat_string]
+                self.cumulative_counter_dict[concat_string] += 1.0
+            r = self.cumulative_counter_dict[concat_string]
             if r == 0:
                 count_rewards.append(0)
             else:
